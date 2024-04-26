@@ -10,14 +10,14 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 
 app.use(cors({
-    origin: 'http://localhost:3000', // Replace with the URL of your React application
+    origin: 'https://lighthouse-q5b7.onrender.com/',
     credentials: true,
 }));
 
 // Middleware to parse JSON requests
 app.use(express.json());
 
-// Create the PostgreSQL pool using the connection string
+// PostgreSQL pool using the connection string
 const pool = new Pool({
     connectionString: 'postgresql://neondb_owner:0cOxDdLE8KSY@ep-holy-cake-a5lsl8iz.us-east-2.aws.neon.tech/neondb?sslmode=require',
 });
