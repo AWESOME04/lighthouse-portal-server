@@ -78,6 +78,10 @@ The server will start running on `http://localhost:5001`.
 - `GET /api/auth/user-details`: Get the user's details
 - `PUT /api/auth/user-details`: Update the user's details
 
+## Contributing
+
+Contributions to the LHP application are welcome! If you find any bugs or have suggestions for improvements, please open an issue or submit a pull request.
+
 ## License
 
 This project is licensed under the [progress never stops](https://www.progressneverstops.com/).
