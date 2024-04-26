@@ -1,11 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
 
 module.exports = (pool) => {
     const router = express.Router();
-    const app = express();
 
     // POST route for login
     router.post('/login', async (req, res) => {

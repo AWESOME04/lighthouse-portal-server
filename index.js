@@ -1,25 +1,25 @@
-// index.js
 const express = require('express');
 const { Pool } = require('pg');
-const cors = require('./cors');
+const cors = require('cors');
 const authRoutes = require('./auth');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Apply CORS middleware
-app.use(cors);
+// Middleware to enable CORS
+app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:3000', // Replace with the URL of your React application
+    credentials: true,
+}));
 
 // Middleware to parse JSON requests
 app.use(express.json());
 
-// Create the PostgreSQL pool
+// Create the PostgreSQL pool using the connection string
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'lighthouse',
-    password: '12345qwerty',
-    port: 5432,
+    connectionString: 'postgresql://neondb_owner:0cOxDdLE8KSY@ep-holy-cake-a5lsl8iz.us-east-2.aws.neon.tech/neondb?sslmode=require',
 });
 
 // Use the authentication routes
