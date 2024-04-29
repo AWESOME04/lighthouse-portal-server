@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 
 app.use(cors({
-    origin: 'https://lighthouse-q5b7.onrender.com',
+    origin: '*',
     credentials: true,
 }));
 
