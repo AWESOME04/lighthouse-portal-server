@@ -67,7 +67,7 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             await pool.query('DELETE FROM memos WHERE id = $1 AND email = $2', [id, email]);
-            res.sendStatus(204);
+            res.json({ message: 'Memo deleted successfully' });
         } catch (error) {
             console.error('Error deleting memo:', error);
             res.status(500).json({ error: 'Internal server error' });
