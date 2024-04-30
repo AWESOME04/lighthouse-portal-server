@@ -5,6 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bfeaa64-ccbe-4356-88bd-eac7b7dbac32" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/hydrationRoutes.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/memoRoutes.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/settingsRoutes.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/userRoutes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
     </list>
@@ -12,6 +16,13 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -57,6 +68,9 @@
       <workItem from="1714068439974" duration="1697000" />
       <workItem from="1714139875060" duration="2225000" />
       <workItem from="1714221921125" duration="4538000" />
+      <workItem from="1714434019836" duration="849000" />
+      <workItem from="1714480658487" duration="434000" />
+      <workItem from="1714485158970" duration="2005000" />
     </task>
     <servers />
   </component>

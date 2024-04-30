@@ -2,6 +2,10 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const authRoutes = require('./auth');
+const memoRoutes = require('./memoRoutes');
+const userRoutes = require('./userRoutes');
+const hydrationRoutes = require('./hydrationRoutes');
+const settingsRoutes = require('./settingsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -22,8 +26,20 @@ const pool = new Pool({
     connectionString: 'postgresql://neondb_owner:0cOxDdLE8KSY@ep-holy-cake-a5lsl8iz.us-east-2.aws.neon.tech/neondb?sslmode=require',
 });
 
-// Use the authentication routes
+// authentication routes
 app.use('/api/auth', authRoutes(pool));
+
+// memo routes
+app.use('/api/memos', memoRoutes(pool));
+
+// user routes
+app.use('/api/users', userRoutes(pool));
+
+// Hydration routes
+app.use('/api/hydration', hydrationRoutes(pool));
+
+// Settings routes
+app.use('/api/settings', settingsRoutes(pool));
 
 app.get('/', (req, res) => {
     res.send('Hello from Express server!');
