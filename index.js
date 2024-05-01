@@ -1,7 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-const authRoutes = require('./auth');
+const authRoutes = require('./authRoutes');
 const memoRoutes = require('./memoRoutes');
 const userRoutes = require('./userRoutes');
 const hydrationRoutes = require('./hydrationRoutes');
