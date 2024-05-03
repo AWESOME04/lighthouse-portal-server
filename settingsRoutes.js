@@ -36,6 +36,14 @@ module.exports = (pool) => {
             const { user_id } = decoded;
             const { campaign_name, day_end_time, notification_enabled, measurement_unit } = req.body;
 
+            // Log the values to verify the user_id
+            console.log('Values:', [user_id, campaign_name, day_end_time, notification_enabled, measurement_unit]);
+
+            // Check if user_id is valid
+            if (!user_id) {
+                return res.status(400).json({ error: 'Invalid user ID' });
+            }
+
             const query = `
                 INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit)
                 VALUES ($1, $2, $3, $4, $5)
