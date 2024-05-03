@@ -1,3 +1,4 @@
+// userRoutes.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
@@ -9,8 +10,8 @@ module.exports = (pool) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
-            res.json({ email });
+            const { email, user_id } = decoded; // Assuming the JWT payload now includes user_id
+            res.json({ email, user_id });
         } catch (error) {
             console.error('Error fetching user email:', error);
             res.status(500).json({ error: 'Internal server error' });
@@ -22,10 +23,11 @@ module.exports = (pool) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
+            const { user_id } = decoded; // Assuming the JWT payload now includes user_id
+
             const { rows } = await pool.query(
-                'SELECT username, email FROM users WHERE email = $1',
-                [email]
+                'SELECT username, email FROM users WHERE user_id = $1',
+                [user_id]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
@@ -42,11 +44,11 @@ module.exports = (pool) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
+            const { user_id } = decoded; // Assuming the JWT payload now includes user_id
             const { username } = req.body;
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1 WHERE email = $2 RETURNING *',
-                [username, email]
+                'UPDATE users SET username = $1 WHERE user_id = $2 RETURNING *',
+                [username, user_id]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });

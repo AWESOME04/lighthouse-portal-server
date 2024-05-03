@@ -1,3 +1,4 @@
+// settingsRoutes.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
@@ -33,7 +34,7 @@ module.exports = (pool) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { user_id } = decoded; // Assuming the JWT payload now includes the user_id field
+            const { user_id } = decoded;
 
             const { campaign_name, day_end_time, notification_enabled, measurement_unit } = req.body;
 
@@ -46,11 +47,11 @@ module.exports = (pool) => {
             }
 
             const query = `
-            INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit)
-            VALUES ($1, $2, $3, $4, $5)
-            ON CONFLICT (user_id)
-            DO UPDATE SET campaign_name = $2, day_end_time = $3, notification_enabled = $4, measurement_unit = $5;
-        `;
+                INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit)
+                VALUES ($1, $2, $3, $4, $5)
+                ON CONFLICT (user_id)
+                DO UPDATE SET campaign_name = $2, day_end_time = $3, notification_enabled = $4, measurement_unit = $5;
+            `;
             const values = [user_id, campaign_name, day_end_time, notification_enabled, measurement_unit];
 
             await pool.query(query, values);
@@ -63,5 +64,6 @@ module.exports = (pool) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+
     return router;
 };
