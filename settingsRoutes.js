@@ -4,6 +4,30 @@ const jwt = require('jsonwebtoken');
 module.exports = (pool) => {
     const router = express.Router();
 
+    // GET route to fetch user settings
+    router.get('/', async (req, res) => {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, 'your_secret_key');
+            const { user_id } = decoded;
+
+            const query = 'SELECT campaign_name, day_end_time, notification_enabled, measurement_unit FROM user_settings WHERE user_id = $1';
+            const result = await pool.query(query, [user_id]);
+
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'User settings not found' });
+            }
+
+            res.status(200).json(result.rows[0]);
+        } catch (error) {
+            console.error('Error fetching user settings:', error);
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ error: 'Invalid token' });
+            }
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
     // PUT route to update user settings
     router.put('/', async (req, res) => {
         try {
@@ -12,25 +36,21 @@ module.exports = (pool) => {
             const { user_id } = decoded;
             const { campaign_name, day_end_time, notification_enabled, measurement_unit } = req.body;
 
-            // Check if user settings already exist
-            const existingSettings = await pool.query('SELECT * FROM user_settings WHERE user_id = $1', [user_id]);
-            if (existingSettings.rows.length === 0) {
-                // If settings don't exist, insert new settings
-                await pool.query(
-                    'INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit) VALUES ($1, $2, $3, $4, $5)',
-                    [user_id, campaign_name, day_end_time, notification_enabled, measurement_unit]
-                );
-            } else {
-                // If settings exist, update them
-                await pool.query(
-                    'UPDATE user_settings SET campaign_name = $1, day_end_time = $2, notification_enabled = $3, measurement_unit = $4 WHERE user_id = $5',
-                    [campaign_name, day_end_time, notification_enabled, measurement_unit, user_id]
-                );
-            }
+            const query = `
+                INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit)
+                VALUES ($1, $2, $3, $4, $5)
+                ON CONFLICT (user_id)
+                DO UPDATE SET campaign_name = $2, day_end_time = $3, notification_enabled = $4, measurement_unit = $5;
+            `;
+            const values = [user_id, campaign_name, day_end_time, notification_enabled, measurement_unit];
 
+            await pool.query(query, values);
             res.status(200).json({ message: 'User settings updated successfully' });
         } catch (error) {
             console.error('Error updating user settings:', error);
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ error: 'Invalid token' });
+            }
             res.status(500).json({ error: 'Internal server error' });
         }
     });
