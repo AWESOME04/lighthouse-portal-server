@@ -24,7 +24,7 @@ module.exports = (pool) => {
             }
 
             // Generate a JWT token
-            const token = jwt.sign({ email }, 'your_secret_key', { expiresIn: '1h' });
+            const token = jwt.sign({ email, user_id: user.id }, 'your_secret_key', { expiresIn: '1h' });
 
             // Return the token in the response
             res.json({ token });
