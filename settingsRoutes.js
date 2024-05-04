@@ -10,7 +10,12 @@ const settingsRoutes = (pool) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { user_id } = decoded;
+            const user_id = decoded.user_id;
+
+            // Check if user_id is valid
+            if (!user_id) {
+                return res.status(401).json({ error: 'Invalid token' });
+            }
 
             const query = 'SELECT campaign_name, day_end_time, notification_enabled, measurement_unit FROM user_settings WHERE user_id = $1';
             const result = await pool.query(query, [user_id]);
@@ -18,10 +23,10 @@ const settingsRoutes = (pool) => {
             if (result.rows.length === 0) {
                 // If the user settings record does not exist, create a new one with default values
                 const insertQuery = `
-                INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit)
-                VALUES ($1, '', '00:00:00', false, 'Metric')
-                RETURNING campaign_name, day_end_time, notification_enabled, measurement_unit;
-            `;
+                    INSERT INTO user_settings (user_id, campaign_name, day_end_time, notification_enabled, measurement_unit)
+                    VALUES ($1, '', '00:00:00', false, 'Metric')
+                    RETURNING campaign_name, day_end_time, notification_enabled, measurement_unit;
+                `;
                 const insertResult = await pool.query(insertQuery, [user_id]);
                 res.status(200).json(insertResult.rows[0]);
             } else {
@@ -41,20 +46,20 @@ const settingsRoutes = (pool) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { user_id } = decoded;
-
-            const { campaign_name, day_end_time, notification_enabled, measurement_unit } = req.body;
+            const user_id = decoded.user_id;
 
             // Check if user_id is valid
             if (!user_id) {
-                return res.status(400).json({ error: 'Invalid user ID' });
+                return res.status(401).json({ error: 'Invalid token' });
             }
 
+            const { campaign_name, day_end_time, notification_enabled, measurement_unit } = req.body;
+
             const query = `
-            UPDATE user_settings
-            SET campaign_name = $2, day_end_time = $3, notification_enabled = $4, measurement_unit = $5
-            WHERE user_id = $1;
-        `;
+                UPDATE user_settings
+                SET campaign_name = $2, day_end_time = $3, notification_enabled = $4, measurement_unit = $5
+                WHERE user_id = $1;
+            `;
             const values = [user_id, campaign_name, day_end_time, notification_enabled, measurement_unit];
 
             await pool.query(query, values);
