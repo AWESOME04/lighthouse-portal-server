@@ -6,6 +6,7 @@ const memoRoutes = require('./memoRoutes');
 const userRoutes = require('./userRoutes');
 const hydrationRoutes = require('./hydrationRoutes');
 const settingsRoutes = require('./settingsRoutes');
+const adminRoutes = require('./adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -40,6 +41,8 @@ app.use('/api/hydration', hydrationRoutes(pool));
 
 // Settings routes
 app.use('/api/settings', settingsRoutes(pool));
+
+app.use('/api/admin', adminRoutes(pool));
 
 app.get('/', (req, res) => {
     res.send('Hello from Express server!');
