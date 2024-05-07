@@ -73,7 +73,10 @@ module.exports = (pool) => {
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            res.json({ profilePictureUrl: rows[0].profile_picture });
+            const profilePictureUrl = rows[0].profile_picture
+                ? `uploads/${rows[0].profile_picture}`
+                : null;
+            res.json({ profilePictureUrl });
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
             res.status(500).json({ error: 'Internal server error' });
@@ -87,7 +90,7 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { username } = req.body;
-            const profile_picture = req.file ? `uploads/${req.file.filename}` : null;
+            const profile_picture = req.file ? req.file.filename : null;
 
             const { rows } = await pool.query(
                 'UPDATE users SET username = $1, profile_picture = $2 WHERE email = $3 RETURNING *',
