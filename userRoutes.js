@@ -59,16 +59,16 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { username } = req.body;
-            const profilePicture = req.file ? `uploads/${req.file.filename}` : null; // Get the uploaded file path or set to null
+            const profile_picture = req.file ? `uploads/${req.file.filename}` : null;
 
             const { rows } = await pool.query(
                 'UPDATE users SET username = $1, profile_picture = $2 WHERE email = $3 RETURNING *',
-                [username, profilePicture, email]
+                [username, profile_picture, email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            res.json(rows[0]); // Return the updated user data
+            res.json(rows[0]);
         } catch (error) {
             console.error('Error updating user details:', error);
             res.status(500).json({ error: 'Internal server error' });
