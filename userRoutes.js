@@ -75,7 +75,7 @@ module.exports = (pool) => {
             }
             const profilePictureUrl = rows[0].profile_picture
                 ? `https://lighthouse-portal.onrender.com/uploads/${rows[0].profile_picture}`
-                : null;
+                : ''; // Set to an empty string instead of null
             res.json({ profilePictureUrl });
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
