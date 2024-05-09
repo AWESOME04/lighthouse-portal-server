@@ -60,7 +60,7 @@ module.exports = (pool) => {
         }
     });
 
-// GET route to fetch the user's profile picture URL
+    // GET route to fetch the user's profile picture URL
     router.get('/profile-picture', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -74,7 +74,7 @@ module.exports = (pool) => {
                 return res.status(404).json({ error: 'User not found' });
             }
             const profilePictureUrl = rows[0].profile_picture
-                ? `uploads/${rows[0].profile_picture}`
+                ? `https://lighthouse-portal.onrender.com/uploads/${rows[0].profile_picture}`
                 : null;
             res.json({ profilePictureUrl });
         } catch (error) {
