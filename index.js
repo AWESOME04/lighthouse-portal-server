@@ -7,9 +7,11 @@ const userRoutes = require('./userRoutes');
 const hydrationRoutes = require('./hydrationRoutes');
 const settingsRoutes = require('./settingsRoutes');
 const adminRoutes = require('./adminRoutes');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware to enable CORS
 app.use(cors());
