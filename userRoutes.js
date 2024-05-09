@@ -47,7 +47,7 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { rows } = await pool.query(
-                'SELECT username, email FROM users WHERE email = $1',
+                'SELECT username, email, profile_picture FROM users WHERE email = $1',
                 [email]
             );
             if (rows.length === 0) {
