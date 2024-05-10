@@ -83,7 +83,7 @@ module.exports = (pool) => {
         }
     });
 
-// PUT route to update the user's details and profile picture
+    // PUT route to update the user's details and profile picture
     router.put('/details', upload.single('profilePicture'), async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -106,5 +106,20 @@ module.exports = (pool) => {
         }
     });
 
+    router.delete('/delete-account', async (req, res) => {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, 'your_secret_key');
+            const { email } = decoded;
+
+            // Delete the user from the database
+            await pool.query('DELETE FROM users WHERE email = $1', [email]);
+
+            res.status(200).json({ message: 'Account deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
     return router;
 };
