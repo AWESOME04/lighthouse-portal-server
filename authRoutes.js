@@ -12,11 +12,19 @@ module.exports = (pool) => {
 
             // Check if the email is 'admin@gmail.com' and password is 'admin'
             if (email === 'admin@gmail.com' && password === 'admin') {
-                // Generate an admin JWT token
-                const adminToken = jwt.sign({ email }, 'your_admin_secret_key', { expiresIn: '1h' });
+                // Check if the admin user exists in the database
+                const { rows } = await pool.query('SELECT * FROM users WHERE email = $1 AND is_admin = true', [email]);
+                if (rows.length === 0) {
+                    return res.status(401).json({ error: 'Invalid admin credentials' });
+                }
 
-                // Return the admin token in the response
-                res.json({ adminToken });
+                const user = rows[0];
+
+                // Generate a JWT token with the user's role
+                const token = jwt.sign({ email, user_id: user.id, is_admin: user.is_admin }, 'your_secret_key', { expiresIn: '1h' });
+
+                // Return the token in the response
+                res.json({ token });
             } else {
                 return res.status(401).json({ error: 'Invalid admin credentials' });
             }
@@ -37,15 +45,16 @@ module.exports = (pool) => {
                 return res.status(401).json({ error: 'Invalid email or password' });
             }
 
-            // Compare the provided password with the hashed password in the database
             const user = rows[0];
+
+            // Compare the provided password with the hashed password in the database
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
                 return res.status(401).json({ error: 'Invalid email or password' });
             }
 
-            // Generate a JWT token
-            const token = jwt.sign({ email, user_id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+            // Generate a JWT token with the user's role
+            const token = jwt.sign({ email, user_id: user.id, is_admin: user.is_admin }, 'your_secret_key', { expiresIn: '1h' });
 
             // Return the token in the response
             res.json({ token });
@@ -72,12 +81,12 @@ module.exports = (pool) => {
 
             // Insert the new user into the database
             await pool.query(
-                'INSERT INTO users (userName, email, password) VALUES ($1, $2, $3)',
-                [userName, email, hashedPassword]
+                'INSERT INTO users (userName, email, password, is_admin) VALUES ($1, $2, $3, $4)',
+                [userName, email, hashedPassword, false] // Set is_admin to false for regular users
             );
 
-            // Generate a JWT token
-            const token = jwt.sign({ email }, 'your_secret_key', { expiresIn: '1h' });
+            // Generate a JWT token with the user's role
+            const token = jwt.sign({ email, is_admin: false }, 'your_secret_key', { expiresIn: '1h' });
 
             res.status(201).json({ token });
         } catch (error) {
