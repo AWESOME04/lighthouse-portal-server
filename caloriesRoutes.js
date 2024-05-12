@@ -8,11 +8,11 @@ module.exports = (pool) => {
     router.post('/calculate', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
-            console.log('Received token:', token); // Log the received token
+            console.log('Received token:', token);
 
             const decoded = jwt.verify(token, 'your_secret_key');
             const { user_id } = decoded;
-            console.log('Decoded user_id:', user_id); // Log the decoded user_id
+            console.log('Decoded user_id:', user_id);
 
             const { age, weight, height, gender, activityLevel } = req.body;
             console.log('Received request body:', req.body);
@@ -36,9 +36,15 @@ module.exports = (pool) => {
             console.log('Response data:', { restingCalories, calorieIntake, caloriesBurned });
 
             res.json({ restingCalories, calorieIntake, caloriesBurned });
-        } catch (error) {
-            console.error('Error calculating calories:', error);
-            res.status(500).json({ error: 'Internal server error' });
+        } catch (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({error: 'Token expired'});
+            } else if (err.name === 'JsonWebTokenError') {
+                return res.status(401).json({error: 'Invalid token'});
+            } else {
+                console.error('Error verifying token:', err);
+                return res.status(500).json({error: 'Internal server error'});
+            }
         }
     });
 
