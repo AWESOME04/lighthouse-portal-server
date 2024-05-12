@@ -12,6 +12,12 @@ const caloriesRoutes = require('./caloriesRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        console.log(`${req.method} ${req.originalUrl} ${res.statusCode}`);
+    });
+    next();
+});
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware to enable CORS

@@ -50,6 +50,8 @@ module.exports = (pool) => {
             const calorieIntake = Math.round(bmr * getActivityFactor(userMeasurements.activity_level));
             const caloriesBurned = Math.round(calorieIntake - restingCalories);
 
+            console.log('Response data:', { restingCalories, calorieIntake, caloriesBurned });
+
             res.json({ restingCalories, calorieIntake, caloriesBurned });
         } catch (error) {
             console.error('Error calculating calories:', error);
