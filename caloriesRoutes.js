@@ -26,28 +26,11 @@ module.exports = (pool) => {
                 return res.status(400).json({ error: 'Invalid input values' });
             }
 
-            // Fetch the user's measurements from the user_measurements table
-            const { rows } = await pool.query(
-                'SELECT age, weight, height, gender, activity_level FROM user_measurements WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
-                [user_id]
-            );
-
-            let userMeasurements;
-            if (rows.length > 0) {
-                userMeasurements = rows[0];
-            } else {
-                // Insert the user's measurements into the user_measurements table
-                const insertResult = await pool.query(
-                    'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-                    [user_id, sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel]
-                );
-                userMeasurements = insertResult.rows[0];
-            }
-
             // Calculate calorie values
-            const bmr = calculateBMR(userMeasurements.gender, userMeasurements.age, userMeasurements.weight, userMeasurements.height);
+            const bmr = calculateBMR(gender, sanitizedAge, sanitizedWeight, sanitizedHeight);
+            const activityFactor = getActivityFactor(activityLevel);
             const restingCalories = Math.round(bmr);
-            const calorieIntake = Math.round(bmr * getActivityFactor(userMeasurements.activity_level));
+            const calorieIntake = Math.round(bmr * activityFactor);
             const caloriesBurned = Math.round(calorieIntake - restingCalories);
 
             console.log('Response data:', { restingCalories, calorieIntake, caloriesBurned });
@@ -61,9 +44,15 @@ module.exports = (pool) => {
 
     // Helper functions for BMR calculation and activity factor
     const calculateBMR = (gender, age, weight, height) => {
-        const bmr = gender === 'male'
-            ? 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age
-            : 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
+        const weightInKg = parseFloat(weight);
+        const heightInCm = parseFloat(height);
+        let bmr;
+
+        if (gender === 'male') {
+            bmr = 88.362 + 13.397 * weightInKg + 4.799 * heightInCm - 5.677 * age;
+        } else {
+            bmr = 447.593 + 9.247 * weightInKg + 3.098 * heightInCm - 4.33 * age;
+        }
 
         return bmr;
     };
