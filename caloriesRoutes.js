@@ -8,9 +8,14 @@ module.exports = (pool) => {
     router.post('/calculate', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
+            console.log('Received token:', token); // Log the received token
+
             const decoded = jwt.verify(token, 'your_secret_key');
             const { user_id } = decoded;
+            console.log('Decoded user_id:', user_id); // Log the decoded user_id
+
             const { age, weight, height, gender, activityLevel } = req.body;
+            console.log('Received request body:', req.body);
 
             // Validate and sanitize input values
             const sanitizedAge = parseInt(age, 10);
