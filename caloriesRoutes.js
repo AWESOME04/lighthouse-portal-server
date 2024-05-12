@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
-module.exports = (pool) => {
+module.exports = () => {
     const router = express.Router();
 
     // POST route to calculate calories
@@ -11,7 +11,8 @@ module.exports = (pool) => {
             console.log('Received token:', token);
 
             const decoded = jwt.verify(token, 'your_secret_key');
-            const { user_id } = decoded;
+            console.log('Decoded token payload:', decoded);
+            const user_id = decoded.user_id;
             console.log('Decoded user_id:', user_id);
 
             const { age, weight, height, gender, activityLevel } = req.body;
