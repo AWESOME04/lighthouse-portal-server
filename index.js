@@ -49,7 +49,7 @@ app.use('/api/users', userRoutes(pool));
 app.use('/api/hydration', hydrationRoutes(pool));
 
 // Calories routes
-app.use('/api/calories', caloriesRoutes());
+app.use('/api/calories', caloriesRoutes(pool));
 
 // Settings routes
 app.use('/api/settings', settingsRoutes(pool));
