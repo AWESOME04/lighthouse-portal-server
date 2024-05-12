@@ -31,15 +31,9 @@ module.exports = (pool) => {
     router.post('/calculate', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
-            console.log('Received token:', token);
-
             const decoded = jwt.verify(token, 'your_secret_key');
-            console.log('Decoded token payload:', decoded);
             const user_id = decoded.user_id;
-            console.log('Decoded user_id:', user_id);
-
             const { age, weight, height, gender, activityLevel } = req.body;
-            console.log('Received request body:', req.body);
 
             // Validate and sanitize input values
             const sanitizedAge = parseInt(age, 10);
@@ -76,8 +70,6 @@ module.exports = (pool) => {
                     [user_id, sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel, restingCalories, calorieIntake, caloriesBurned]
                 );
             }
-
-            console.log('Response data:', { restingCalories, calorieIntake, caloriesBurned });
 
             res.json({ restingCalories, calorieIntake, caloriesBurned });
         } catch (err) {
