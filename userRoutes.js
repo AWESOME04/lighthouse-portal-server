@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 
-
 const fs = require('fs');
 const uploadDir = 'uploads/';
 
@@ -103,28 +102,6 @@ module.exports = (pool) => {
             res.json(rows[0]);
         } catch (error) {
             console.error('Error updating user details:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-
-
-    // POST route to store user measurements
-    router.post('/measurements', async (req, res) => {
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, 'your_secret_key');
-            const { user_id } = decoded;
-            const { age, weight, height, gender, activity_level } = req.body;
-
-            // Insert the user measurements into the user_measurements table
-            await pool.query(
-                'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level) VALUES ($1, $2, $3, $4, $5, $6)',
-                [user_id, age, weight, height, gender, activity_level]
-            );
-
-            res.status(200).json({ message: 'User measurements saved successfully' });
-        } catch (error) {
-            console.error('Error saving user measurements:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });

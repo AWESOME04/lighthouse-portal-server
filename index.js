@@ -8,6 +8,7 @@ const hydrationRoutes = require('./hydrationRoutes');
 const settingsRoutes = require('./settingsRoutes');
 const adminRoutes = require('./adminRoutes');
 const path = require('path');
+const caloriesRoutes = require('./caloriesRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -40,6 +41,9 @@ app.use('/api/users', userRoutes(pool));
 
 // Hydration routes
 app.use('/api/hydration', hydrationRoutes(pool));
+
+// Calories routes
+app.use('/api/calories', caloriesRoutes(pool));
 
 // Settings routes
 app.use('/api/settings', settingsRoutes(pool));
