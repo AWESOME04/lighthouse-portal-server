@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
-module.exports = () => {
+module.exports = (pool) => {
     const router = express.Router();
 
     // POST route to calculate calories
@@ -33,6 +33,26 @@ module.exports = () => {
             const restingCalories = Math.round(bmr);
             const calorieIntake = Math.round(bmr * activityFactor);
             const caloriesBurned = Math.round(calorieIntake - restingCalories);
+
+            // Check if the user's measurements exist in the database
+            const { rows } = await pool.query(
+                'SELECT * FROM user_measurements WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+                [user_id]
+            );
+
+            if (rows.length > 0) {
+                // Update the existing measurements
+                await pool.query(
+                    'UPDATE user_measurements SET age = $1, weight = $2, height = $3, gender = $4, activity_level = $5, resting_calories = $6, calorie_intake = $7, calories_burned = $8 WHERE id = $9',
+                    [sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel, restingCalories, calorieIntake, caloriesBurned, rows[0].id]
+                );
+            } else {
+                // Insert a new measurement
+                await pool.query(
+                    'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level, resting_calories, calorie_intake, calories_burned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+                    [user_id, sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel, restingCalories, calorieIntake, caloriesBurned]
+                );
+            }
 
             console.log('Response data:', { restingCalories, calorieIntake, caloriesBurned });
 
