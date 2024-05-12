@@ -27,6 +27,7 @@ module.exports = (pool) => {
                 [user_id]
             );
 
+
             let userMeasurements;
             if (rows.length === 0) {
                 // Insert the user's measurements into the user_measurements table
