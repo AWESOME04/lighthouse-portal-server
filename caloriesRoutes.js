@@ -18,18 +18,22 @@ module.exports = (pool) => {
                 [user_id]
             );
 
+            let userMeasurements;
             if (rows.length === 0) {
                 // Insert the user's measurements into the user_measurements table
-                await pool.query(
-                    'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level) VALUES ($1, $2, $3, $4, $5, $6)',
+                const insertResult = await pool.query(
+                    'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
                     [user_id, age, weight, height, gender, activityLevel]
                 );
+                userMeasurements = insertResult.rows[0];
+            } else {
+                userMeasurements = rows[0];
             }
 
             // Calculate calorie values
-            const bmr = calculateBMR(gender, age, weight, height);
+            const bmr = calculateBMR(userMeasurements.gender, userMeasurements.age, userMeasurements.weight, userMeasurements.height);
             const restingCalories = Math.round(bmr);
-            const calorieIntake = Math.round(bmr * getActivityFactor(activityLevel));
+            const calorieIntake = Math.round(bmr * getActivityFactor(userMeasurements.activity_level));
             const caloriesBurned = Math.round(calorieIntake - restingCalories);
 
             res.json({ restingCalories, calorieIntake, caloriesBurned });
