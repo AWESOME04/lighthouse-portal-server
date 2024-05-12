@@ -12,6 +12,15 @@ module.exports = (pool) => {
             const { user_id } = decoded;
             const { age, weight, height, gender, activityLevel } = req.body;
 
+            // Validate and sanitize input values
+            const sanitizedAge = parseInt(age, 10);
+            const sanitizedWeight = parseFloat(weight);
+            const sanitizedHeight = parseInt(height, 10);
+
+            if (isNaN(sanitizedAge) || isNaN(sanitizedWeight) || isNaN(sanitizedHeight)) {
+                return res.status(400).json({ error: 'Invalid input values' });
+            }
+
             // Fetch the user's measurements from the user_measurements table
             const { rows } = await pool.query(
                 'SELECT age, weight, height, gender, activity_level FROM user_measurements WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
@@ -23,7 +32,7 @@ module.exports = (pool) => {
                 // Insert the user's measurements into the user_measurements table
                 const insertResult = await pool.query(
                     'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-                    [user_id, age, weight, height, gender, activityLevel]
+                    [user_id, sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel]
                 );
                 userMeasurements = insertResult.rows[0];
             } else {
@@ -45,15 +54,9 @@ module.exports = (pool) => {
 
     // Helper functions for BMR calculation and activity factor
     const calculateBMR = (gender, age, weight, height) => {
-        const weightInKg = parseFloat(weight);
-        const heightInCm = parseFloat(height);
-        let bmr;
-
-        if (gender === 'male') {
-            bmr = 88.362 + 13.397 * weightInKg + 4.799 * heightInCm - 5.677 * age;
-        } else {
-            bmr = 447.593 + 9.247 * weightInKg + 3.098 * heightInCm - 4.33 * age;
-        }
+        const bmr = gender === 'male'
+            ? 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age
+            : 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
 
         return bmr;
     };
