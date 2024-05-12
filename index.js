@@ -6,7 +6,7 @@ const memoRoutes = require('./memoRoutes');
 const userRoutes = require('./userRoutes');
 const hydrationRoutes = require('./hydrationRoutes');
 const settingsRoutes = require('./settingsRoutes');
-const adminRoutes = require('./adminRoutes');
+// const adminRoutes = require('./adminRoutes');
 const path = require('path');
 const caloriesRoutes = require('./caloriesRoutes');
 
@@ -48,7 +48,7 @@ app.use('/api/calories', caloriesRoutes(pool));
 // Settings routes
 app.use('/api/settings', settingsRoutes(pool));
 
-app.use('/api/admin', adminRoutes(pool));
+// app.use('/api/admin', adminRoutes(pool));
 
 app.get('/', (req, res) => {
     res.send('Hello from Express server!');
