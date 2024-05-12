@@ -27,17 +27,16 @@ module.exports = (pool) => {
                 [user_id]
             );
 
-
             let userMeasurements;
-            if (rows.length === 0) {
+            if (rows.length > 0) {
+                userMeasurements = rows[0];
+            } else {
                 // Insert the user's measurements into the user_measurements table
                 const insertResult = await pool.query(
                     'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
                     [user_id, sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel]
                 );
                 userMeasurements = insertResult.rows[0];
-            } else {
-                userMeasurements = rows[0];
             }
 
             // Calculate calorie values
