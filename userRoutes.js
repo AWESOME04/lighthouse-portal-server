@@ -73,10 +73,13 @@ module.exports = (pool) => {
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            const profilePictureUrl = rows[0].profile_picture
-                ? `${req.protocol}://${req.get('host')}/uploads/${rows[0].profile_picture}`
-                : '';
-            res.json({ profilePictureUrl });
+            const profilePicturePath = rows[0].profile_picture;
+            if (profilePicturePath) {
+                const filePath = path.join(__dirname, 'uploads', profilePicturePath);
+                res.sendFile(filePath);
+            } else {
+                res.status(404).json({ error: 'Profile picture not found' });
+            }
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
             res.status(500).json({ error: 'Internal server error' });
