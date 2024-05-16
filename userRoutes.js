@@ -106,6 +106,7 @@ module.exports = (pool) => {
         }
     });
 
+    // Delete route to delete a particular user from the database
     router.delete('/delete-account', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -121,5 +122,40 @@ module.exports = (pool) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+
+
+    // PUT route to update the user's password
+    router.put('/change-password', async (req, res) => {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, 'your_secret_key');
+            const { email } = decoded;
+            const { currentPassword, newPassword } = req.body;
+
+            // Check if the current password is correct
+            const { rows } = await pool.query('SELECT password FROM users WHERE email = $1', [email]);
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            const user = rows[0];
+            const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: 'Invalid current password' });
+            }
+
+            // Hash the new password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+            // Update the user's password in the database
+            await pool.query('UPDATE users SET password = $1 WHERE email = $2', [hashedPassword, email]);
+
+            res.status(200).json({ message: 'Password updated successfully' });
+        } catch (error) {
+            console.error('Error updating password:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
     return router;
 };
