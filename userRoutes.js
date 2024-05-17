@@ -84,7 +84,7 @@ module.exports = (pool) => {
         }
     });
 
-    // PUT route to update the user's details and profile picture
+    // PUT route to update the user's details and profile picture section
     router.put('/details', upload.single('profilePicture'), async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
