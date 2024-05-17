@@ -90,16 +90,20 @@ module.exports = (pool) => {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
-            const { username } = req.body;
+            const { username, email: newEmail } = req.body;
             const profile_picture = req.file ? req.file.filename : null;
 
+            // Update the user details in the database
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1, profile_picture = $2 WHERE email = $3 RETURNING *',
-                [username, profile_picture, email]
+                'UPDATE users SET username = $1, email = $2, profile_picture = $3 WHERE email = $4 RETURNING *',
+                [username, newEmail, profile_picture, email]
             );
+
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
+
+            // Return the updated user details
             res.json(rows[0]);
         } catch (error) {
             console.error('Error updating user details:', error);
