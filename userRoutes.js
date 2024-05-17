@@ -3,11 +3,9 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
-
 const fs = require('fs');
 const uploadDir = 'uploads/';
 
-// Create the uploads directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
@@ -28,20 +26,6 @@ const upload = multer({ storage });
 module.exports = (pool) => {
     const router = express.Router();
 
-    // GET route to fetch the user's email
-    router.get('/', async (req, res) => {
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
-            res.json({ email });
-        } catch (error) {
-            console.error('Error fetching user email:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-
-    // GET route to fetch the user's details
     router.get('/details', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -61,30 +45,6 @@ module.exports = (pool) => {
         }
     });
 
-    // GET route to fetch the user's profile picture URL
-    router.get('/profile-picture', async (req, res) => {
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
-            const { rows } = await pool.query(
-                'SELECT profile_picture FROM users WHERE email = $1',
-                [email]
-            );
-            if (rows.length === 0) {
-                return res.status(404).json({ error: 'User not found' });
-            }
-            const profilePictureUrl = rows[0].profile_picture
-                ? `${req.protocol}://${req.get('host')}/uploads/${rows[0].profile_picture}`
-                : '';
-            res.json({ profilePictureUrl });
-        } catch (error) {
-            console.error('Error fetching user profile picture:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-
-    // PUT route to update the user's details and profile picture section
     router.put('/details', upload.single('profilePicture'), async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -93,9 +53,8 @@ module.exports = (pool) => {
             const { username, email: newEmail } = req.body;
             const profile_picture = req.file ? req.file.filename : null;
 
-            // Update the user details in the database
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1, email = $2, profile_picture = $3 WHERE email = $4 RETURNING *',
+                'UPDATE users SET username = $1, email = $2, profile_picture = $3 WHERE email = $4 RETURNING username, email, profile_picture',
                 [username, newEmail, profile_picture, email]
             );
 
@@ -103,7 +62,6 @@ module.exports = (pool) => {
                 return res.status(404).json({ error: 'User not found' });
             }
 
-            // Return the updated user details
             res.json(rows[0]);
         } catch (error) {
             console.error('Error updating user details:', error);
@@ -111,25 +69,6 @@ module.exports = (pool) => {
         }
     });
 
-    // Delete route to delete a particular user from the database
-    router.delete('/delete-account', async (req, res) => {
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
-
-            // Delete the user from the database
-            await pool.query('DELETE FROM users WHERE email = $1', [email]);
-
-            res.status(200).json({ message: 'Account deleted successfully' });
-        } catch (error) {
-            console.error('Error deleting account:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-
-
-    // PUT route to update the user's password
     router.put('/change-password', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -137,27 +76,25 @@ module.exports = (pool) => {
             const { email } = decoded;
             const { currentPassword, newPassword } = req.body;
 
-            // Check if the current password is correct
             const { rows } = await pool.query('SELECT password FROM users WHERE email = $1', [email]);
+
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            const user = rows[0];
-            const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-            if (!isPasswordValid) {
-                return res.status(401).json({ error: 'Invalid current password' });
+
+            const isMatch = await bcrypt.compare(currentPassword, rows[0].password);
+
+            if (!isMatch) {
+                return res.status(400).json({ error: 'Current password is incorrect' });
             }
 
-            // Hash the new password
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-            // Update the user's password in the database
             await pool.query('UPDATE users SET password = $1 WHERE email = $2', [hashedPassword, email]);
 
-            res.status(200).json({ message: 'Password updated successfully' });
+            res.json({ message: 'Password changed successfully' });
         } catch (error) {
-            console.error('Error updating password:', error);
+            console.error('Error changing password:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
