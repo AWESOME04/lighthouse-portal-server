@@ -5,6 +5,27 @@ const jwt = require('jsonwebtoken');
 module.exports = (pool) => {
     const router = express.Router();
 
+    // POST route for admin login
+    router.post('/admin-login', async (req, res) => {
+        try {
+            const { email, password } = req.body;
+
+            // Check if the email is 'admin@gmail.com' and password is 'admin'
+            if (email === 'admin@gmail.com' && password === 'admin') {
+                // Generate an admin JWT token
+                const adminToken = jwt.sign({ email }, 'your_admin_secret_key', { expiresIn: '1h' });
+
+                // Return the admin token in the response
+                res.json({ adminToken });
+            } else {
+                return res.status(401).json({ error: 'Invalid admin credentials' });
+            }
+        } catch (error) {
+            console.error('Error in admin login:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
     // POST route for login
     router.post('/login', async (req, res) => {
         try {
