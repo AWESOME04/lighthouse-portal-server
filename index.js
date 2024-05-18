@@ -6,7 +6,6 @@ const memoRoutes = require('./memoRoutes');
 const userRoutes = require('./userRoutes');
 const hydrationRoutes = require('./hydrationRoutes');
 const settingsRoutes = require('./settingsRoutes');
-// const adminRoutes = require('./adminRoutes');
 const path = require('path');
 const caloriesRoutes = require('./caloriesRoutes');
 

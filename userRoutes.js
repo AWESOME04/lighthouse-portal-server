@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const sharp = require('sharp');
 
 const fs = require('fs');
 const uploadDir = 'uploads/';
@@ -61,7 +62,7 @@ module.exports = (pool) => {
         }
     });
 
-    // GET route to fetch the user's profile picture URL
+    // GET route to fetch the user's resized profile picture URL
     router.get('/profile-picture', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -74,10 +75,19 @@ module.exports = (pool) => {
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            const profilePictureUrl = rows[0].profile_picture
-                ? `${req.protocol}://${req.get('host')}/uploads/${rows[0].profile_picture}`
-                : '';
-            res.json({ profilePictureUrl });
+
+            const profilePictureFilename = rows[0].profile_picture;
+            if (!profilePictureFilename) {
+                return res.json({ profilePictureUrl: '' });
+            }
+
+            const profilePicturePath = path.join(__dirname, 'uploads', profilePictureFilename);
+            const resizedImageBuffer = await sharp(profilePicturePath)
+                .resize(40, 40) // Adjust the dimensions as needed
+                .toBuffer();
+
+            res.set('Content-Type', 'image/jpeg'); // Set the appropriate content type
+            res.send(resizedImageBuffer);
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
             res.status(500).json({ error: 'Internal server error' });
