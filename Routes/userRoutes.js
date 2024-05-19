@@ -86,28 +86,24 @@ module.exports = (pool) => {
                 return res.json({ profilePictureUrl: '' }); // Send an empty URL if no profile picture
             }
 
-            const profilePicturePath = path.join(__dirname, '..', 'uploads', profilePictureFilename);
-
-            // Read the image and create a circular crop with sharp
+            const profilePicturePath = path.join(
+                __dirname,
+                '..',
+                'uploads',
+                profilePictureFilename
+            );
             const resizedImageBuffer = await sharp(profilePicturePath)
-                .resize(40, 40)
-                .composite([{
-                    input: Buffer.from(
-                        `<svg><circle cx="20" cy="20" r="20"/></svg>`
-                    ),
-                    blend: 'dest-in'
-                }])
-                .png()
+                .resize(100, 100) // Adjust the width and height as desired
+                .toFormat('jpeg') // Convert the image to JPEG format
                 .toBuffer();
 
-            res.set('Content-Type', 'image/png');
+            res.set('Content-Type', 'image/jpeg');
             res.send(resizedImageBuffer);
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
-
 
 
     // PUT route to update the user's details and profile picture
