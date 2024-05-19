@@ -49,14 +49,14 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { rows } = await pool.query(
-                'SELECT username, email, profile_picture FROM users WHERE email = $1',
+                'SELECT username, email, profilepic FROM users WHERE email = $1',
                 [email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
             const user = rows[0];
-            const profilePictureUrl = user.profile_picture ? `/uploads/${user.profile_picture}` : ''; // Use default URL if no profile picture
+            const profilePictureUrl = user.profilepic ? `/uploads/${user.profilepic}` : ''; // Use default URL if no profile picture
             res.json({ ...user, profilePictureUrl });
         } catch (error) {
             console.error('Error fetching user details:', error);
@@ -72,24 +72,24 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { rows } = await pool.query(
-                'SELECT profile_picture FROM users WHERE email = $1',
+                'SELECT profilepic FROM users WHERE email = $1',
                 [email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
 
-            const profilePictureFilename = rows[0].profile_picture;
+            const profilePictureFilename = rows[0].profilepic;
             if (!profilePictureFilename) {
                 return res.json({ profilePictureUrl: '' }); // Send an empty URL if no profile picture
             }
 
             const profilePicturePath = path.join(__dirname, 'uploads', profilePictureFilename);
             const resizedImageBuffer = await sharp(profilePicturePath)
-                .resize(40, 40) // Adjust the dimensions as needed
+                .resize(40, 40)
                 .toBuffer();
 
-            res.set('Content-Type', 'image/jpeg'); // Set the appropriate content type
+            res.set('Content-Type', 'image/jpeg');
             res.send(resizedImageBuffer);
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
@@ -105,11 +105,11 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { username } = req.body;
-            const profile_picture = req.file ? req.file.filename : null;
+            const profilepic = req.file ? req.file.filename : null;
 
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1, profile_picture = $2 WHERE email = $3 RETURNING *',
-                [username, profile_picture, email]
+                'UPDATE users SET username = $1, profilepic = $2 WHERE email = $3 RETURNING *',
+                [username, profilepic, email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
