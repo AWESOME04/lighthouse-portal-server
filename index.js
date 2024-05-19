@@ -1,13 +1,13 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-const authRoutes = require('./authRoutes');
-const memoRoutes = require('./memoRoutes');
-const userRoutes = require('./userRoutes');
-const hydrationRoutes = require('./hydrationRoutes');
-const settingsRoutes = require('./settingsRoutes');
+const authRoutes = require('./Routes/authRoutes');
+const memoRoutes = require('./Routes/memoRoutes');
+const userRoutes = require('./Routes/userRoutes');
+const hydrationRoutes = require('./Routes/hydrationRoutes');
+const settingsRoutes = require('./Routes/settingsRoutes');
 const path = require('path');
-const caloriesRoutes = require('./caloriesRoutes');
+const caloriesRoutes = require('./Routes/caloriesRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
