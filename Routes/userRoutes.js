@@ -56,7 +56,9 @@ module.exports = (pool) => {
                 return res.status(404).json({ error: 'User not found' });
             }
             const user = rows[0];
-            const profilePictureUrl = user.profilepic ? `/uploads/${user.profilepic}` : ''; // Use default URL if no profile picture
+            const profilePictureUrl = user.profilepic
+                ? `https://lighthouse-portal.onrender.com/uploads/${user.profilepic}`
+                : '';
             res.json({ ...user, profilePictureUrl });
         } catch (error) {
             console.error('Error fetching user details:', error);
