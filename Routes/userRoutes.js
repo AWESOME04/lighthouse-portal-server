@@ -55,12 +55,15 @@ module.exports = (pool) => {
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            res.json(rows[0]);
+            const user = rows[0];
+            const profilePictureUrl = user.profile_picture ? `/uploads/${user.profile_picture}` : ''; // Use default URL if no profile picture
+            res.json({ ...user, profilePictureUrl });
         } catch (error) {
             console.error('Error fetching user details:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+
 
     // GET route to fetch the user's resized profile picture URL
     router.get('/profile-picture', async (req, res) => {
@@ -78,7 +81,7 @@ module.exports = (pool) => {
 
             const profilePictureFilename = rows[0].profile_picture;
             if (!profilePictureFilename) {
-                return res.json({ profilePictureUrl: '' });
+                return res.json({ profilePictureUrl: '' }); // Send an empty URL if no profile picture
             }
 
             const profilePicturePath = path.join(__dirname, 'uploads', profilePictureFilename);
@@ -93,6 +96,7 @@ module.exports = (pool) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+
 
     // PUT route to update the user's details and profile picture
     router.put('/details', upload.single('profilePicture'), async (req, res) => {
