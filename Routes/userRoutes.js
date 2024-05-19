@@ -87,17 +87,27 @@ module.exports = (pool) => {
             }
 
             const profilePicturePath = path.join(__dirname, '..', 'uploads', profilePictureFilename);
+
+            // Read the image and create a circular crop with sharp
             const resizedImageBuffer = await sharp(profilePicturePath)
                 .resize(40, 40)
+                .composite([{
+                    input: Buffer.from(
+                        `<svg><circle cx="20" cy="20" r="20"/></svg>`
+                    ),
+                    blend: 'dest-in'
+                }])
+                .png()
                 .toBuffer();
 
-            res.set('Content-Type', 'image/jpeg');
+            res.set('Content-Type', 'image/png');
             res.send(resizedImageBuffer);
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+
 
 
     // PUT route to update the user's details and profile picture
