@@ -84,7 +84,7 @@ module.exports = (pool) => {
                 return res.json({ profilePictureUrl: '' }); // Send an empty URL if no profile picture
             }
 
-            const profilePicturePath = path.join(__dirname, 'uploads', profilePictureFilename);
+            const profilePicturePath = path.join(__dirname, '..', 'uploads', profilePictureFilename);
             const resizedImageBuffer = await sharp(profilePicturePath)
                 .resize(40, 40)
                 .toBuffer();
