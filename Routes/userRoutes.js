@@ -66,7 +66,6 @@ module.exports = (pool) => {
         }
     });
 
-
     // GET route to fetch the user's resized profile picture URL
     router.get('/profile-picture', async (req, res) => {
         try {
