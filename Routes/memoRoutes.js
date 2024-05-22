@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 module.exports = (pool) => {
     const router = express.Router();
 
-    // Memo-related routes
+    // Post route to insert a new memo
     router.post('/', async (req, res) => {
         try {
             const { email, memo } = req.body;
@@ -23,6 +23,7 @@ module.exports = (pool) => {
         }
     });
 
+    // Get route to fetch memos
     router.get('/', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
@@ -39,6 +40,7 @@ module.exports = (pool) => {
         }
     });
 
+    // Put route to edit a specific memo
     router.put('/:id', async (req, res) => {
         try {
             const { id } = req.params;
@@ -60,6 +62,7 @@ module.exports = (pool) => {
         }
     });
 
+    // Delete route to remove an existing memo
     router.delete('/:id', async (req, res) => {
         try {
             const { id } = req.params;

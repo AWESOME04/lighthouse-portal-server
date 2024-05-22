@@ -57,7 +57,7 @@ module.exports = (pool) => {
             }
             const user = rows[0];
             const profilePictureUrl = user.profilepic
-                ? `https://lighthouse-portal.onrender.com/uploads/${user.profilepic}`
+                ? `${req.protocol}://${req.get('host')}/uploads/${user.profilepic}`
                 : '';
             res.json({ ...user, profilePictureUrl });
         } catch (error) {
@@ -83,7 +83,7 @@ module.exports = (pool) => {
 
             const profilePictureFilename = rows[0].profilepic;
             if (!profilePictureFilename) {
-                return res.json({ profilePictureUrl: '' }); // Send an empty URL if no profile picture
+                return res.json({ profilePictureUrl: '' });
             }
 
             const profilePicturePath = path.join(
