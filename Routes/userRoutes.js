@@ -93,8 +93,8 @@ module.exports = (pool) => {
                 profilePictureFilename
             );
             const resizedImageBuffer = await sharp(profilePicturePath)
-                .resize(100, 100) // Adjust the width and height as desired
-                .toFormat('jpeg') // Convert the image to JPEG format
+                .resize(100, 100)
+                .toFormat('jpeg')
                 .toBuffer();
 
             res.set('Content-Type', 'image/jpeg');
@@ -107,27 +107,43 @@ module.exports = (pool) => {
 
 
     // PUT route to update the user's details and profile picture
-    router.put('/details', upload.single('profilePicture'), async (req, res) => {
+    router.get('/profile-picture', async (req, res) => {
         try {
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
-            const { username } = req.body;
-            const profilepic = req.file ? req.file.filename : null;
-
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1, profilepic = $2 WHERE email = $3 RETURNING *',
-                [username, profilepic, email]
+                'SELECT profilepic FROM users WHERE email = $1',
+                [email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            res.json(rows[0]);
+
+            const profilePictureFilename = rows[0].profilepic;
+            if (!profilePictureFilename) {
+                return res.json({ profilePictureUrl: '' });
+            }
+
+            const profilePicturePath = path.join(
+                __dirname,
+                '..',
+                'uploads',
+                profilePictureFilename
+            );
+            const resizedImageBuffer = await sharp(profilePicturePath)
+                .resize(100, 100)
+                .toFormat('jpeg')
+                .toBuffer();
+
+            res.set('Content-Type', 'image/jpeg');
+            res.send(resizedImageBuffer);
         } catch (error) {
-            console.error('Error updating user details:', error);
+            console.error('Error fetching user profile picture:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+
 
     // Delete route to delete a particular user from the database
     router.delete('/delete-account', async (req, res) => {
