@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2bfeaa64-ccbe-4356-88bd-eac7b7dbac32" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Routes/userRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/Routes/userRoutes.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +52,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2023.3.6\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -97,7 +97,9 @@
       <workItem from="1716052526741" duration="4701000" />
       <workItem from="1716137701442" duration="9755000" />
       <workItem from="1716196767784" duration="2593000" />
-      <workItem from="1716302005546" duration="813000" />
+      <workItem from="1716302005546" duration="1836000" />
+      <workItem from="1716326861956" duration="2533000" />
+      <workItem from="1716383649395" duration="958000" />
     </task>
     <servers />
   </component>
