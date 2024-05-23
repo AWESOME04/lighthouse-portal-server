@@ -41,6 +41,28 @@ module.exports = (pool) => {
     });
 
     // Put route to edit a specific memo
+    router.put('/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { memo } = req.body;
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, 'your_secret_key');
+            const { email } = decoded;
+            const { rows } = await pool.query(
+                'UPDATE memos SET memo = $1 WHERE id = $2 AND email = $3 RETURNING *',
+                [memo, id, email]
+            );
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Memo not found' });
+            }
+            res.json(rows[0]);
+        } catch (error) {
+            console.error('Error updating memo:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
+    // Put route to edit a specific memo's done status
     router.put('/:id/done', async (req, res) => {
         try {
             const { id } = req.params;
