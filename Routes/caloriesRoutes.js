@@ -55,31 +55,42 @@ module.exports = (pool) => {
             const { rows } = await pool.query(
                 'SELECT * FROM user_measurements WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
                 [user_id]
-            );
+            ).catch((err) => {
+                console.error('Error querying user measurements:', err);
+                return res.status(500).json({ error: 'Internal server error' });
+            });
 
             if (rows.length > 0) {
                 // Update the existing measurements
                 await pool.query(
                     'UPDATE user_measurements SET age = $1, weight = $2, height = $3, gender = $4, activity_level = $5, resting_calories = $6, calorie_intake = $7, calories_burned = $8 WHERE id = $9',
                     [sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel, restingCalories, calorieIntake, caloriesBurned, rows[0].id]
-                );
+                ).catch((err) => {
+                    console.error('Error updating user measurements:', err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                });
             } else {
                 // Insert a new measurement
                 await pool.query(
                     'INSERT INTO user_measurements (user_id, age, weight, height, gender, activity_level, resting_calories, calorie_intake, calories_burned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
                     [user_id, sanitizedAge, sanitizedWeight, sanitizedHeight, gender, activityLevel, restingCalories, calorieIntake, caloriesBurned]
-                );
+                ).catch((err) => {
+                    console.error('Error inserting user measurements:', err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                });
             }
 
             res.json({ restingCalories, calorieIntake, caloriesBurned });
         } catch (err) {
             if (err.name === 'TokenExpiredError') {
-                return res.status(401).json({error: 'Token expired'});
+                console.error('Token expired:', err);
+                return res.status(401).json({ error: 'Token expired' });
             } else if (err.name === 'JsonWebTokenError') {
-                return res.status(401).json({error: 'Invalid token'});
+                console.error('Invalid token:', err);
+                return res.status(401).json({ error: 'Invalid token' });
             } else {
-                console.error('Error verifying token:', err);
-                return res.status(500).json({error: 'Internal server error'});
+                console.error('Error verifying token or executing database operations:', err);
+                return res.status(500).json({ error: 'Internal server error' });
             }
         }
     });
