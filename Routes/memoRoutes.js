@@ -11,7 +11,7 @@ module.exports = (pool) => {
             console.log('Received email:', email, 'memo:', memo);
 
             const { rows } = await pool.query(
-                'INSERT INTO memos (email, memo) VALUES ($1, $2) RETURNING *',
+                'INSERT INTO memos (email, memo, done) VALUES ($1, $2, false) RETURNING *',
                 [email, memo]
             );
 
@@ -41,23 +41,23 @@ module.exports = (pool) => {
     });
 
     // Put route to edit a specific memo
-    router.put('/:id', async (req, res) => {
+    router.put('/:id/done', async (req, res) => {
         try {
             const { id } = req.params;
-            const { memo } = req.body;
+            const done = req.body.done;
             const token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { rows } = await pool.query(
-                'UPDATE memos SET memo = $1 WHERE id = $2 AND email = $3 RETURNING *',
-                [memo, id, email]
+                'UPDATE memos SET done = $1 WHERE id = $2 AND email = $3 RETURNING *',
+                [done, id, email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'Memo not found' });
             }
             res.json(rows[0]);
         } catch (error) {
-            console.error('Error updating memo:', error);
+            console.error('Error updating memo done state:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
