@@ -59,7 +59,8 @@ module.exports = (pool) => {
             const profilePictureUrl = user.profilepic
                 ? `${req.protocol}://${req.get('host')}/uploads/${user.profilepic}`
                 : '';
-            res.json({ ...user, profilePictureUrl });
+            // res.json({ ...user, profilePictureUrl });
+            res.json({ ...user, profilePictureFilename: user.profilepic });
         } catch (error) {
             console.error('Error fetching user details:', error);
             res.status(500).json({ error: 'Internal server error' });
@@ -101,6 +102,22 @@ module.exports = (pool) => {
             res.send(resizedImageBuffer);
         } catch (error) {
             console.error('Error fetching user profile picture:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
+    router.get('/profile-picture/:filename', async (req, res) => {
+        const { filename } = req.params;
+        const profilePicturePath = path.join(__dirname, '..', 'uploads', filename);
+
+        try {
+            if (fs.existsSync(profilePicturePath)) {
+                res.sendFile(profilePicturePath);
+            } else {
+                res.status(404).json({ error: 'Profile picture not found' });
+            }
+        } catch (err) {
+            console.error('Error serving profile picture:', err);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
