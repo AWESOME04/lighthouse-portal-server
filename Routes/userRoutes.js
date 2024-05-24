@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const sharp = require('sharp');
+const isDev = process.env.NODE_ENV !== 'production';
 
 const fs = require('fs');
 const uploadDir = 'uploads/';
@@ -108,13 +109,19 @@ module.exports = (pool) => {
 
     router.get('/profile-picture/:filename', async (req, res) => {
         const { filename } = req.params;
-        const profilePicturePath = path.join(__dirname, '..', 'uploads', filename);
 
         try {
-            if (fs.existsSync(profilePicturePath)) {
-                res.sendFile(profilePicturePath);
+            if (isDev) {
+                // Serve the profile picture in development environment
+                const profilePicturePath = path.join(__dirname, '..', 'uploads', filename);
+                if (fs.existsSync(profilePicturePath)) {
+                    res.sendFile(profilePicturePath);
+                } else {
+                    res.status(404).json({ error: 'Profile picture not found' });
+                }
             } else {
-                res.status(404).json({ error: 'Profile picture not found' });
+                // Serve the profile picture in production environment
+                res.sendFile(path.join(__dirname, '..', 'uploads', filename));
             }
         } catch (err) {
             console.error('Error serving profile picture:', err);
