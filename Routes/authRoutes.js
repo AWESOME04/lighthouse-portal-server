@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 module.exports = (pool) => {
     const router = express.Router();
 
+    // POST route for admin
+    router.post('/admin')
+
     // POST route for login
     router.post('/login', async (req, res) => {
         try {
@@ -61,6 +64,29 @@ module.exports = (pool) => {
             res.status(201).json({ token });
         } catch (error) {
             console.error('Error in signup:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
+
+    // POST route for refreshing token
+    router.post('/refresh-token', async (req, res) => {
+        try {
+            const { token } = req.body;
+
+            // Verify the token and check if it's still valid
+            jwt.verify(token, 'your_secret_key', (err, decoded) => {
+                if (err) {
+                    return res.status(401).json({ error: 'Invalid token' });
+                }
+
+                // Generate a new token with a fresh expiration time
+                const newToken = jwt.sign({ email: decoded.email, user_id: decoded.user_id }, 'your_secret_key', { expiresIn: '1h' });
+
+                res.json({ token: newToken });
+            });
+        } catch (error) {
+            console.error('Error refreshing token:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
