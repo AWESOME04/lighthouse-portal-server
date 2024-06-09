@@ -5,6 +5,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const sharp = require('sharp');
 const isDev = process.env.NODE_ENV !== 'production';
+const { bucket } = require('../firebase');
 
 const fs = require('fs');
 const uploadDir = 'uploads/';
@@ -70,39 +71,24 @@ module.exports = (pool) => {
 
 
     // GET route to fetch the user's resized profile picture URL
-    router.get('/profile-picture', async (req, res) => {
+    router.get('/profile-picture/:filename', async (req, res) => {
+        const { filename } = req.params;
+
         try {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
-            const { rows } = await pool.query(
-                'SELECT profilepic FROM users WHERE email = $1',
-                [email]
-            );
-            if (rows.length === 0) {
-                return res.status(404).json({ error: 'User not found' });
+            const file = bucket.file(filename);
+            const [exists] = await file.exists();
+
+            if (exists) {
+                const [metadata] = await file.getMetadata();
+                const stream = file.createReadStream();
+
+                res.set('Content-Type', metadata.contentType);
+                stream.pipe(res);
+            } else {
+                res.status(404).json({ error: 'Profile picture not found' });
             }
-
-            const profilePictureFilename = rows[0].profilepic;
-            if (!profilePictureFilename) {
-                return res.json({ profilePictureUrl: '' });
-            }
-
-            const profilePicturePath = path.join(
-                __dirname,
-                '..',
-                'uploads',
-                profilePictureFilename
-            );
-            const resizedImageBuffer = await sharp(profilePicturePath)
-                .resize(100, 100)
-                .toFormat('jpeg')
-                .toBuffer();
-
-            res.set('Content-Type', 'image/jpeg');
-            res.send(resizedImageBuffer);
-        } catch (error) {
-            console.error('Error fetching user profile picture:', error);
+        } catch (err) {
+            console.error('Error serving profile picture:', err);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
@@ -137,11 +123,13 @@ module.exports = (pool) => {
             const decoded = jwt.verify(token, 'your_secret_key');
             const { email } = decoded;
             const { username } = req.body;
-            const profilepic = req.file ? req.file.filename : null;
+
+            // Upload the profile picture to Firebase Storage
+            const profilePicture = req.file ? await uploadFile(req.file) : null;
 
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1, profilepic = $2 WHERE email = $3 RETURNING *',
-                [username, profilepic, email]
+                'UPDATE users SET username = $1, profilePic = $2 WHERE email = $3 RETURNING *',
+                [username, profilePicture, email]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
@@ -205,4 +193,27 @@ module.exports = (pool) => {
     });
 
     return router;
+};
+
+// Helper function to upload files to Firebase Storage
+const uploadFile = async (file) => {
+    const fileName = `${Date.now()}_${Math.round(Math.random() * 1000000000)}${path.extname(file.originalname)}`;
+    const fileUpload = bucket.file(fileName);
+    const stream = fileUpload.createWriteStream({
+        metadata: {
+            contentType: file.mimetype
+        }
+    });
+
+    stream.on('error', (err) => {
+        console.error('Error uploading file:', err);
+    });
+
+    stream.on('finish', async () => {
+        await fileUpload.makePublic();
+    });
+
+    stream.end(file.buffer);
+
+    return fileName;
 };
