@@ -210,6 +210,7 @@ const uploadFile = async (file) => {
     });
 
     stream.on('finish', async () => {
+        // Make the uploaded file public
         await fileUpload.makePublic();
     });
 
