@@ -146,7 +146,7 @@ module.exports = (pool) => {
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
-            res.json({ ...rows[0], profilePictureFilename: profilepic });
+            res.json(rows[0]);
         } catch (error) {
             console.error('Error updating user details:', error);
             res.status(500).json({ error: 'Internal server error' });
