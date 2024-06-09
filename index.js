@@ -56,8 +56,6 @@ app.use('/api/calories', caloriesRoutes(pool));
 // Settings routes
 app.use('/api/settings', settingsRoutes(pool));
 
-// app.use('/api/admin', adminRoutes(pool));
-
 // User measurements routes
 app.use('/api/measurements', userMeasurementsRoutes(pool));
 

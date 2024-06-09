@@ -5,9 +5,6 @@ const jwt = require('jsonwebtoken');
 module.exports = (pool) => {
     const router = express.Router();
 
-    // POST route for admin
-    router.post('/admin')
-
     // POST route for login
     router.post('/login', async (req, res) => {
         try {
