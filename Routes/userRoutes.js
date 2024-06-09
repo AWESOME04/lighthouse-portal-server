@@ -5,8 +5,16 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const sharp = require('sharp');
 const isDev = process.env.NODE_ENV !== 'production';
-const { bucket } = require('../firebase');
+const { getStorage, ref, getDownloadURL } = require('firebase/storage');
+const admin = require('firebase-admin');
+const serviceAccount = require('../serviceKey.json');
 
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: 'lighthouse-78743.appspot.com',
+});
+
+const bucket = admin.storage().bucket();
 const fs = require('fs');
 const uploadDir = 'uploads/';
 
