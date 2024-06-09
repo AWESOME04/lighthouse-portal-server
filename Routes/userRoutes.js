@@ -5,16 +5,9 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const sharp = require('sharp');
 const isDev = process.env.NODE_ENV !== 'production';
-const { getStorage, ref, getDownloadURL } = require('firebase/storage');
+const { bucket } = require('../firebase');
 const admin = require('firebase-admin');
-const serviceAccount = require('../serviceKey.json');
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: 'lighthouse-78743.appspot.com',
-});
-
-const bucket = admin.storage().bucket();
 const fs = require('fs');
 const uploadDir = 'uploads/';
 
@@ -83,15 +76,18 @@ module.exports = (pool) => {
         const { filename } = req.params;
 
         try {
+            const bucket = admin.storage().bucket();
             const file = bucket.file(filename);
             const [exists] = await file.exists();
 
             if (exists) {
                 const [metadata] = await file.getMetadata();
-                const stream = file.createReadStream();
+                const signedUrl = await file.getSignedUrl({
+                    action: 'read',
+                    expires: '03-09-2500', // Adjust the expiration date as needed
+                });
 
-                res.set('Content-Type', metadata.contentType);
-                stream.pipe(res);
+                res.redirect(signedUrl[0]);
             } else {
                 res.status(404).json({ error: 'Profile picture not found' });
             }
