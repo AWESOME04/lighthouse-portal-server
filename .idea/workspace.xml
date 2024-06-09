@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bfeaa64-ccbe-4356-88bd-eac7b7dbac32" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Routes/userMeasurementsRoutes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Routes/authRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/Routes/authRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Routes/caloriesRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/Routes/caloriesRoutes.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +24,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;AWESOME04&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/AWESOME04/lighthouse-portal-server.git&quot;,
+    &quot;accountId&quot;: &quot;047c3576-2e1d-4b07-af4a-2e6526c1fe79&quot;
+  }
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -46,7 +59,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;20.12.0&quot;,
-    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;20.12.8&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;20.12.13&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Snave/Downloads/lighthouse-server/lighthouse-portal-server&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -62,6 +75,13 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Snave\Downloads\lighthouse-server\lighthouse-portal-server\Routes" />
     </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-WS-241.17011.90" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -104,7 +124,10 @@
       <workItem from="1716405282102" duration="504000" />
       <workItem from="1716407744514" duration="7577000" />
       <workItem from="1716573271645" duration="3625000" />
-      <workItem from="1716800916913" duration="1664000" />
+      <workItem from="1716800916913" duration="2317000" />
+      <workItem from="1717090763962" duration="575000" />
+      <workItem from="1717868587064" duration="2073000" />
+      <workItem from="1717952354718" duration="1631000" />
     </task>
     <servers />
   </component>
