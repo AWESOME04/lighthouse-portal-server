@@ -11,6 +11,10 @@
 # production
 /build
 
+# others
+code_context.txt
+get_code_context.sh
+
 # misc
 .DS_Store
 .env.local
