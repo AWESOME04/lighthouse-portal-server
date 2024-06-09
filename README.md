@@ -6,20 +6,24 @@ This repository contains the backend code for a Progressive Web Application (PWA
 
 ## Features
 
-- User authentication (signup and login)
-- Create, read, update, and delete memos
-- Track and update user's hydration level
-- Fetch and update user settings (theme, language, notifications, font size, dark mode schedule)
-- Fetch and update user details (username, email)
+    User authentication (signup, login, token refresh)
+    User profile management (view, update, delete account)
+    Hydration tracking
+    Calorie calculation based on user metrics
+    Memo management (CRUD operations)
+    User settings management
+    Profile picture uploads
 
 ## Technologies Used
 
-- Node.js
-- Express.js
-- PostgreSQL
-- JSON Web Tokens (JWT) for authentication
-- bcrypt for password hashing
-- cors for handling CORS requests
+    Node.js
+    Express.js
+    PostgreSQL (with pg library)
+    JSON Web Tokens (JWT) for authentication
+    bcrypt for password hashing
+    multer for file uploads
+    sharp for image processing
+    CORS for handling cross-origin requests
 
 ## Getting Started
 
@@ -50,33 +54,45 @@ npm start
 The server will start running on `http://localhost:5001`.
 
 ## API Endpoints
-
 ### Authentication
 
-- `POST /api/auth/login`: Log in a user
-- `POST /api/auth/signup`: Sign up a new user
+    POST /api/auth/signup: User registration
+    POST /api/auth/login: User login
+    POST /api/auth/refresh-token: Refresh JWT token
 
-### Memos
+### User Routes
 
-- `POST /api/auth/memos`: Create a new memo
-- `GET /api/auth/memos`: Get all memos for the authenticated user
-- `PUT /api/auth/memos/:id`: Update a memo
-- `DELETE /api/auth/memos/:id`: Delete a memo
+    GET /api/users/: Get user email
+    GET /api/users/details: Get user details
+    PUT /api/users/details: Update user details
+    DELETE /api/users/delete-account: Delete user account
+    PUT /api/users/change-password: Change user password
 
-### Hydration
+### Memo Routes
 
-- `GET /api/auth/hydration`: Get the user's hydration level
-- `PUT /api/auth/hydration`: Update the user's hydration level
+    POST /api/memos: Create a memo
+    GET /api/memos: Get all memos
+    PUT /api/memos/:id: Update a memo
+    PUT /api/memos/:id/done: Update memo completion status
+    DELETE /api/memos/:id: Delete a memo
 
-### Settings
+#### Hydration Routes
 
-- `GET /api/auth/settings`: Get the user's settings
-- `PUT /api/auth/settings`: Update the user's settings
+    GET /api/hydration: Get hydration data
+    PUT /api/hydration: Update hydration data
 
-### User Details
+#### Calories Routes
 
-- `GET /api/auth/user-details`: Get the user's details
-- `PUT /api/auth/user-details`: Update the user's details
+    POST /api/calories/calculate: Calculate calories
+
+#### Settings Routes
+
+    GET /api/settings: Get user settings
+    PUT /api/settings: Update user settings
+
+### User Measurements Routes
+
+    GET /api/measurements: Get user measurements
 
 ## Contributing
 
