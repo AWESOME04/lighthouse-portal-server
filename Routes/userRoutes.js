@@ -76,10 +76,9 @@ module.exports = (pool) => {
             }
             const user = rows[0];
             const profilePictureUrl = user.profilepic
-                ? `${req.protocol}://${req.get('host')}/uploads/${user.profilepic}`
+                ? `https://firebasestorage.googleapis.com/v0/b/lighthouse-78743.appspot.com/o/${user.profilepic}?alt=media`
                 : '';
-            // res.json({ ...user, profilePictureUrl });
-            res.json({ ...user, profilePictureFilename: user.profilepic });
+            res.json({ ...user, profilePictureUrl });
         } catch (error) {
             console.error('Error fetching user details:', error);
             res.status(500).json({ error: 'Internal server error' });
