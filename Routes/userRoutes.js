@@ -67,10 +67,7 @@ module.exports = (pool) => {
                 return res.status(404).json({ error: 'User not found' });
             }
             const user = rows[0];
-            const profilePictureUrl = user.profilepic
-                ? `https://firebasestorage.googleapis.com/v0/b/lighthouse-78743.appspot.com/o/${user.profilepic}?alt=media`
-                : '';
-            res.json({ ...user, profilePictureUrl });
+            res.json({ ...user, profilePictureUrl: user.profilepic || '' });
         } catch (error) {
             console.error('Error fetching user details:', error);
             res.status(500).json({ error: 'Internal server error' });
