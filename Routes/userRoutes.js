@@ -7,13 +7,6 @@ const sharp = require('sharp');
 const isDev = process.env.NODE_ENV !== 'production';
 const { bucket } = require('../firebase');
 const admin = require('firebase-admin');
-const fs = require('fs');
-const uploadDir = 'uploads/';
-
-// Create the uploads directory if it doesn't exist
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -75,7 +68,7 @@ module.exports = (pool) => {
         const { filename } = req.params;
 
         try {
-            const bucket = admin.storage().bucket();
+            const bucket = admin.storage().bucket('lighthouse-78743.appspot.com');
             const file = bucket.file(filename);
             const [exists] = await file.exists();
 
@@ -89,28 +82,6 @@ module.exports = (pool) => {
                 res.redirect(signedUrl[0]);
             } else {
                 res.status(404).json({ error: 'Profile picture not found' });
-            }
-        } catch (err) {
-            console.error('Error serving profile picture:', err);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-
-    router.get('/profile-picture/:filename', async (req, res) => {
-        const { filename } = req.params;
-
-        try {
-            if (isDev) {
-                // Serve the profile picture in development environment
-                const profilePicturePath = path.join(__dirname, '..', 'uploads', filename);
-                if (fs.existsSync(profilePicturePath)) {
-                    res.sendFile(profilePicturePath);
-                } else {
-                    res.status(404).json({ error: 'Profile picture not found' });
-                }
-            } else {
-                // Serve the profile picture in production environment
-                res.sendFile(path.join(__dirname, '..', 'uploads', filename));
             }
         } catch (err) {
             console.error('Error serving profile picture:', err);
