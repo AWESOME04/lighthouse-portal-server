@@ -87,30 +87,30 @@ module.exports = (pool) => {
 
 
     // GET route to fetch the user's resized profile picture URL
-    router.get('/profile-picture/:filename', async (req, res) => {
-        const { filename } = req.params;
-
-        try {
-            const bucket = admin.storage().bucket('lighthouse-78743.appspot.com');
-            const file = bucket.file(filename);
-            const [exists] = await file.exists();
-
-            if (exists) {
-                const [metadata] = await file.getMetadata();
-                const signedUrl = await file.getSignedUrl({
-                    action: 'read',
-                    expires: '03-09-2500', // Adjust the expiration date as needed
-                });
-
-                res.redirect(signedUrl[0]);
-            } else {
-                res.status(404).json({ error: 'Profile picture not found' });
-            }
-        } catch (err) {
-            console.error('Error serving profile picture:', err);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
+    // router.get('/profile-picture/:filename', async (req, res) => {
+    //     const { filename } = req.params;
+    //
+    //     try {
+    //         const bucket = admin.storage().bucket('lighthouse-78743.appspot.com');
+    //         const file = bucket.file(filename);
+    //         const [exists] = await file.exists();
+    //
+    //         if (exists) {
+    //             const [metadata] = await file.getMetadata();
+    //             const signedUrl = await file.getSignedUrl({
+    //                 action: 'read',
+    //                 expires: '03-09-2500', // Adjust the expiration date as needed
+    //             });
+    //
+    //             res.redirect(signedUrl[0]);
+    //         } else {
+    //             res.status(404).json({ error: 'Profile picture not found' });
+    //         }
+    //     } catch (err) {
+    //         console.error('Error serving profile picture:', err);
+    //         res.status(500).json({ error: 'Internal server error' });
+    //     }
+    // });
 
 
     // PUT route to update the user's details and profile picture
