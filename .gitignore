@@ -15,6 +15,9 @@
 code_context.txt
 get_code_context.sh
 
+# service account key
+serviceKey.json
+
 # misc
 .DS_Store
 .env.local
