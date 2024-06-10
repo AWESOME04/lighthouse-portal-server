@@ -1,13 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
-const admin = require('firebase-admin');
-const serviceAccount = require('./serviceKey.json');
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: 'lighthouse-78743.appspot.com'
-});
-
+import 'firebase/compat/storage';
 
 const cors = require('cors');
 const authRoutes = require('./Routes/authRoutes');
