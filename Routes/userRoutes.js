@@ -21,6 +21,30 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Helper function to upload files to Firebase Storage
+const uploadFile = async (file) => {
+    const fileName = `${Date.now()}_${Math.round(Math.random() * 1000000000)}${path.extname(file.originalname)}`;
+    const fileUpload = bucket.file(fileName);
+    const stream = fileUpload.createWriteStream({
+        metadata: {
+            contentType: file.mimetype
+        }
+    });
+
+    stream.on('error', (err) => {
+        console.error('Error uploading file:', err);
+    });
+
+    stream.on('finish', async () => {
+        // Make the uploaded file public
+        await fileUpload.makePublic();
+    });
+
+    stream.end(file.buffer);
+
+    return fileName;
+}
+
 module.exports = (pool) => {
     const router = express.Router();
 
@@ -167,28 +191,4 @@ module.exports = (pool) => {
     });
 
     return router;
-};
-
-// Helper function to upload files to Firebase Storage
-const uploadFile = async (file) => {
-    const fileName = `${Date.now()}_${Math.round(Math.random() * 1000000000)}${path.extname(file.originalname)}`;
-    const fileUpload = bucket.file(fileName);
-    const stream = fileUpload.createWriteStream({
-        metadata: {
-            contentType: file.mimetype
-        }
-    });
-
-    stream.on('error', (err) => {
-        console.error('Error uploading file:', err);
-    });
-
-    stream.on('finish', async () => {
-        // Make the uploaded file public
-        await fileUpload.makePublic();
-    });
-
-    stream.end(file.buffer);
-
-    return fileName;
 };
