@@ -7,7 +7,6 @@ const sharp = require('sharp');
 const isDev = process.env.NODE_ENV !== 'production';
 const { bucket } = require('../firebase');
 const admin = require('firebase-admin');
-
 const fs = require('fs');
 const uploadDir = 'uploads/';
 
