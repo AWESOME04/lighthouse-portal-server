@@ -4,21 +4,10 @@ const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const sharp = require('sharp');
-const isDev = process.env.NODE_ENV !== 'production';
 const { bucket } = require('../firebase');
 const admin = require('firebase-admin');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const extension = path.extname(file.originalname);
-        const filename = `${Date.now()}_${Math.round(Math.random() * 1000000000)}${extension}`;
-        cb(null, filename);
-    },
-});
-
+const storage = multer.memoryStorage(); // Use memory storage to handle the buffer directly
 const upload = multer({ storage });
 
 // Helper function to upload files to Firebase Storage
@@ -27,23 +16,26 @@ const uploadFile = async (file) => {
     const fileUpload = bucket.file(fileName);
     const stream = fileUpload.createWriteStream({
         metadata: {
-            contentType: file.mimetype
-        }
+            contentType: file.mimetype,
+        },
     });
 
-    stream.on('error', (err) => {
-        console.error('Error uploading file:', err);
+    return new Promise((resolve, reject) => {
+        stream.on('error', (err) => {
+            console.error('Error uploading file:', err);
+            reject(err);
+        });
+
+        stream.on('finish', async () => {
+            // Make the uploaded file public
+            await fileUpload.makePublic();
+            const publicUrl = fileUpload.publicUrl();
+            resolve(publicUrl);
+        });
+
+        stream.end(file.buffer);
     });
-
-    stream.on('finish', async () => {
-        // Make the uploaded file public
-        await fileUpload.makePublic();
-    });
-
-    stream.end(file.buffer);
-
-    return fileName;
-}
+};
 
 module.exports = (pool) => {
     const router = express.Router();
@@ -85,34 +77,6 @@ module.exports = (pool) => {
         }
     });
 
-
-    // GET route to fetch the user's resized profile picture URL
-    // router.get('/profile-picture/:filename', async (req, res) => {
-    //     const { filename } = req.params;
-    //
-    //     try {
-    //         const bucket = admin.storage().bucket('lighthouse-78743.appspot.com');
-    //         const file = bucket.file(filename);
-    //         const [exists] = await file.exists();
-    //
-    //         if (exists) {
-    //             const [metadata] = await file.getMetadata();
-    //             const signedUrl = await file.getSignedUrl({
-    //                 action: 'read',
-    //                 expires: '03-09-2500', // Adjust the expiration date as needed
-    //             });
-    //
-    //             res.redirect(signedUrl[0]);
-    //         } else {
-    //             res.status(404).json({ error: 'Profile picture not found' });
-    //         }
-    //     } catch (err) {
-    //         console.error('Error serving profile picture:', err);
-    //         res.status(500).json({ error: 'Internal server error' });
-    //     }
-    // });
-
-
     // PUT route to update the user's details and profile picture
     router.put('/details', upload.single('profilePicture'), async (req, res) => {
         try {
@@ -121,40 +85,26 @@ module.exports = (pool) => {
             const { email } = decoded;
             const { username } = req.body;
 
-            // Upload the profile picture to Firebase Storage
-            const profilePicture = req.file ? await uploadFile(req.file) : null;
+            let profilePictureUrl = null;
+            if (req.file) {
+                profilePictureUrl = await uploadFile(req.file);
+            }
 
             const { rows } = await pool.query(
-                'UPDATE users SET username = $1, profilePic = $2 WHERE email = $3 RETURNING *',
-                [username, profilePicture, email]
+                'UPDATE users SET username = $1, profilepic = $2 WHERE email = $3 RETURNING *',
+                [username, profilePictureUrl, email]
             );
+
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
+
             res.json(rows[0]);
         } catch (error) {
             console.error('Error updating user details:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
-
-    // Delete route to delete a particular user from the database
-    router.delete('/delete-account', async (req, res) => {
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, 'your_secret_key');
-            const { email } = decoded;
-
-            // Delete the user from the database
-            await pool.query('DELETE FROM users WHERE email = $1', [email]);
-
-            res.status(200).json({ message: 'Account deleted successfully' });
-        } catch (error) {
-            console.error('Error deleting account:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-
 
     // PUT route to update the user's password
     router.put('/change-password', async (req, res) => {
