@@ -1,8 +1,6 @@
 const express = require('express');
 const { Pool } = require('pg');
 
-import 'firebase/compat/storage';
-
 const cors = require('cors');
 const authRoutes = require('./Routes/authRoutes');
 const memoRoutes = require('./Routes/memoRoutes');
