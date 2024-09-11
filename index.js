@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
 
@@ -33,7 +34,7 @@ app.use(express.json());
 
 // PostgreSQL pool using the connection string
 const pool = new Pool({
-    connectionString: 'postgresql://neondb_owner:0cOxDdLE8KSY@ep-holy-cake-a5lsl8iz.us-east-2.aws.neon.tech/neondb?sslmode=require',
+    connectionString: process.env.DATABASE_URL,
 });
 
 // authentication routes
